@@ -49,36 +49,35 @@ def create_image(page_size, pen_color, text, font_path):
         max_width = width - 2 * margin
         y_position = 100  # Start writing below the top margin
 
-        # Split text into paragraphs and handle word wrapping
-        paragraphs = text.split("\n")
-        for paragraph in paragraphs:
-            words = paragraph.split(" ")
-            line = ""
+        # Split text into lines as per manual breaks (\n)
+        lines = text.split("\n")
+
+        for line in lines:
+            # Split the line into smaller parts if it exceeds the max width
+            words = line.split(" ")
+            current_line = ""
+
             for word in words:
-                # Check if adding the next word exceeds the maximum width
-                test_line = f"{line} {word}".strip()
+                test_line = f"{current_line} {word}".strip()
                 text_width = font.getlength(test_line)
                 if text_width <= max_width:
-                    line = test_line
+                    current_line = test_line
                 else:
                     # Draw the current line and start a new one
-                    draw.text((margin, y_position), line, fill=pen_color, font=font)
+                    draw.text((margin, y_position), current_line, fill=pen_color, font=font)
                     y_position += line_spacing
-                    line = word
+                    current_line = word
 
                     # Check if we've reached the bottom of the page
                     if y_position + line_spacing > height:
                         raise HTTPException(status_code=400, detail="Text exceeds page size")
 
             # Draw any remaining text in the current line
-            if line:
-                draw.text((margin, y_position), line, fill=pen_color, font=font)
+            if current_line:
+                draw.text((margin, y_position), current_line, fill=pen_color, font=font)
                 y_position += line_spacing
 
-            # Add extra spacing between paragraphs
-            y_position += line_spacing
-
-            # Check if we've reached the bottom of the page
+            # Move to the next line only (no extra space added)
             if y_position + line_spacing > height:
                 raise HTTPException(status_code=400, detail="Text exceeds page size")
 
