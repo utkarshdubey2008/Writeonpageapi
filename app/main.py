@@ -22,11 +22,24 @@ FONTS = {
     "sansita": "fonts/Sansita-Regular.ttf"  # New font added
 }
 
-# Function to create an image with the given parameters
+# Function to create a ruled page background
+def create_ruled_page(width, height, line_spacing=70):
+    image = Image.new("RGB", (width, height), "white")
+    draw = ImageDraw.Draw(image)
+
+    # Draw horizontal lines
+    for y in range(100, height, line_spacing):
+        draw.line([(50, y), (width - 50, y)], fill=(200, 200, 200), width=2)
+
+    return image
+
+
+# Function to overlay text on the ruled page
 def create_image(page_size, pen_color, text, font_path):
     try:
         width, height = page_size
-        image = Image.new("RGB", (width, height), "white")
+        # Create a ruled page
+        image = create_ruled_page(width, height)
         draw = ImageDraw.Draw(image)
         font = ImageFont.truetype(font_path, 50)  # Set default font size to 50
 
